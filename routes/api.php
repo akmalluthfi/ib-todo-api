@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\TodoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,11 +15,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('register', [AuthController::class, 'store']);
-Route::post('login', [AuthController::class, 'authenticate']);
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth.jwt');
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth.jwt');
 
-Route::get('todo', function () {
+Route::get('/', function () {
     $user = auth()->user();
     dd($user);
-})->middleware('auth.jwt');
+});
+
+Route::apiResource('/todos', TodoController::class)->except([
+    'edit', 'create'
+])->middleware('auth.jwt');

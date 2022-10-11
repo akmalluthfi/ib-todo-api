@@ -3,68 +3,56 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function store(Request $request)
+    private AuthService $service;
+
+    public function __construct()
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:3|max:255',
-            'email' => 'required|email:dns|unique:users',
-            'password' => 'required|min:5|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation Error',
-                'data' => null,
-                'error' => $validator->errors()
-            ], 422);
-        }
-
-        $validated = $validator->validated();
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password'])
-        ]);
-
-        return response()->json([
-            'message' => 'Created',
-            'data' => $user,
-            'error' => null,
-        ]);
+        $this->service = new AuthService;
     }
 
-    public function authenticate(Request $request)
+    public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email:dns',
-            'password' => 'required'
-        ]);
-
-        if ($validator->fails()) {
+        try {
+            $user = $this->service->store($request->all());
+        } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation Error',
                 'data' => null,
-                'error' => $validator->errors()
-            ], 422);
+                'error' => $e->errors()
+            ], 400);
         }
 
-        $credentials = $validator->validated();
+        return response()->json([
+            'message' => 'Register Successfully',
+            'data' => $user,
+            'error' => null,
+        ], 201);
+    }
 
-        if (!$token = JWTAuth::attempt($credentials)) {
+    public function login(Request $request)
+    {
+        try {
+            $token = $this->service->authenticate($request->all());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation Error',
+                'data' => null,
+                'error' => $e->errors(),
+            ], 400);
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Unauthorized',
                 'data' => null,
-                'error' => null,
-            ]);
+                'error' => $e->getMessage()
+            ], 401);
         }
 
         return response()->json([
@@ -79,10 +67,10 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->logout();
+        $this->service->logout();
 
         return response()->json([
-            'message' => 'Logout successfully',
+            'message' => 'Logout Successfully',
             'data' => null,
             'error' => null,
         ]);

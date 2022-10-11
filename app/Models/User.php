@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
@@ -45,5 +47,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function todos()
+    {
+        return $this->hasMany(Todo::class);
     }
 }
