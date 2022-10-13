@@ -4,13 +4,21 @@ namespace App\Services;
 
 use Exception;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
+
+  private UserRepository $userRepository;
+
+  public function __construct()
+  {
+    $this->userRepository = new UserRepository;
+  }
+
   public function store(array $data): User
   {
     $validator = Validator::make($data, [
@@ -23,13 +31,7 @@ class AuthService
       throw new ValidationException($validator);
     }
 
-    $user = User::create([
-      'name' => $data['name'],
-      'email' => $data['email'],
-      'password' => Hash::make($data['password'])
-    ]);
-
-    return $user;
+    return $this->userRepository->create($data);
   }
 
   public function authenticate(array $credentials): string

@@ -5,17 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
     private AuthService $service;
 
-    public function __construct()
+    public function __construct(AuthService $service)
     {
-        $this->service = new AuthService;
+        $this->service = $service;
     }
 
     public function register(Request $request)

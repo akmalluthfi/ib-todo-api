@@ -19,11 +19,6 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth.jwt');
 
-Route::get('/', function () {
-    $user = auth()->user();
-    dd($user);
-});
-
-Route::apiResource('/todos', TodoController::class)->except([
-    'edit', 'create'
-])->middleware('auth.jwt');
+Route::apiResource('/todos', TodoController::class)
+    ->except('show')
+    ->middleware('auth.jwt');

@@ -17,11 +17,11 @@ class TodoFactory extends Factory
      */
     public function definition()
     {
-        $date = fake()->dateTimeThisMonth('+12 days');
         return [
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
-            'due_date' => new \MongoDB\BSON\UTCDateTime($date),
+            'due_date' => fake()->dateTimeThisMonth('+12 days'),
+            'is_complete' => fake()->boolean()
         ];
     }
 }

@@ -3,17 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Todo;
+use App\Http\Requests\TodoRequest;
 use App\Services\TodoService;
-use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
-    private $service;
+    private TodoService $service;
 
-    public function __construct()
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(TodoService $service)
     {
-        $this->service = new TodoService;
+        $this->service = $service;
     }
 
     /**
@@ -23,77 +27,57 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $user_id = auth()->user()->_id;
-        return response()->json([
-            'message' => '',
-            'data' => $this->service->getTodos($user_id),
-            'error' => null
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->service->getTodos();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\TodoRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TodoRequest $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Todo  $todo
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Todo $todo)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Todo  $todo
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Todo $todo)
-    {
-        //
+        $validatedData  = $request->validated();
+        $todo = $this->service->createTodo($validatedData);
+        return response()->json([
+            'message' => 'Todo Created Successfully',
+            'data' => $todo,
+            'error' => null
+        ], 201);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Todo  $todo
+     * @param  \App\Http\Requests\TodoRequest  $request
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Todo $todo)
+    public function update(TodoRequest $request, string $id)
     {
-        //
+        $validatedData = $request->validated();
+        $todo = $this->service->updateTodo($validatedData, $id);
+        return response()->json([
+            'message' => 'Todo Updated Successfully',
+            'data' => $todo,
+            'error' => null
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Todo  $todo
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Todo $todo)
+    public function destroy(string $id)
     {
-        //
+        $this->service->deleteTodo($id);
+        return response()->json([
+            'message' => 'Todo Deleted Successfully',
+            'data' => null,
+            'error' => null
+        ]);
     }
 }

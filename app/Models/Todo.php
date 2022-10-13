@@ -9,6 +9,10 @@ class Todo extends Model
 {
     use HasFactory;
 
+    protected $dates = [
+        'due_date'
+    ];
+
     public function user()
     {
         $this->belongsTo(User::class);
