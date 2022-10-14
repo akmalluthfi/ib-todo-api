@@ -19,32 +19,13 @@ class AuthService
     $this->userRepository = new UserRepository;
   }
 
-  public function store(array $data): User
+  public function store(array $data)
   {
-    $validator = Validator::make($data, [
-      'name' => 'required|min:3|max:255',
-      'email' => 'required|email:dns|unique:users',
-      'password' => 'required|min:5|max:255',
-    ]);
-
-    if ($validator->fails()) {
-      throw new ValidationException($validator);
-    }
-
-    return $this->userRepository->create($data);
+    $this->userRepository->create($data);
   }
 
   public function authenticate(array $credentials): string
   {
-    $validator = Validator::make($credentials, [
-      'email' => 'required|email:dns',
-      'password' => 'required'
-    ]);
-
-    if ($validator->fails()) {
-      throw new ValidationException($validator);
-    }
-
     if (!$token = JWTAuth::attempt($credentials)) {
       throw new Exception('These credentials do not match our records.');
     }

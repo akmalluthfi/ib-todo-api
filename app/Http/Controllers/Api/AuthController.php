@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\RegisterUserRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -16,35 +18,23 @@ class AuthController extends Controller
         $this->service = $service;
     }
 
-    public function register(Request $request)
+    public function register(RegisterUserRequest $request)
     {
-        try {
-            $user = $this->service->store($request->all());
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation Error',
-                'data' => null,
-                'error' => $e->errors()
-            ], 400);
-        }
-
+        $validatedData = $request->validated();
+        $this->service->store($validatedData);
         return response()->json([
             'message' => 'Register Successfully',
-            'data' => $user,
+            'data' => null,
             'error' => null,
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginUserRequest $request)
     {
+        $validatedData = $request->validated();
+
         try {
-            $token = $this->service->authenticate($request->all());
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation Error',
-                'data' => null,
-                'error' => $e->errors(),
-            ], 400);
+            $token = $this->service->authenticate($validatedData);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Unauthorized',
