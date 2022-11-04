@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Api\JsonRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class TodoRequest extends JsonRequest
+class TodoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

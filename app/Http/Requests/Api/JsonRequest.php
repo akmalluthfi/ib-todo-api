@@ -30,14 +30,14 @@ abstract class JsonRequest extends FormRequest
    *
    * @throws \Illuminate\Http\Exceptions\HttpResponseException
    */
-  protected function failedValidation(Validator $validator)
-  {
-    throw new HttpResponseException(
-      response()->json([
-        'message' => 'Validation Error',
-        'data' => null,
-        'error' => $validator->errors()
-      ])
-    );
-  }
+  // protected function failedValidation(Validator $validator)
+  // {
+  //   throw new HttpResponseException(
+  //     response()->json([
+  //       'message' => 'Validation Error',
+  //       'data' => null,
+  //       'errors' => $validator->errors()
+  //     ], 400)
+  //   );
+  // }
 }

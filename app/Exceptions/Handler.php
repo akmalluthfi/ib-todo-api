@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Throwable;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
@@ -52,6 +53,15 @@ class Handler extends ExceptionHandler
                     'data' => null,
                     'error' => 'Required parameters are not available'
                 ], 405);
+            }
+        });
+
+        // handle validation error
+        $this->renderable(function (ValidationException $e, $request) {
+            if ($request->exceptJson()) {
+                return response()->json([
+                    'errors' => $e->errors(),
+                ], 400);
             }
         });
 

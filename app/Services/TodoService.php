@@ -28,6 +28,7 @@ class TodoService
 
   public function updateTodo(array $data, string $id)
   {
+    $data['status'] = true;
     $todo = $this->repository->updateTodo($data, $id);
     return new TodoResource($todo);
   }
